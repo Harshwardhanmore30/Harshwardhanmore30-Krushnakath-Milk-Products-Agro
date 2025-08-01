@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Profile - KrishnaKath Dairy</title>
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='index.css') }}"
+    />
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='profile.css') }}"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap"
+      rel="stylesheet"
+    />
+  </head>
+  <body>
+    <!-- Toast Notification -->
+    <div id="toast" class="toast"></div>
+
+    <!-- Header -->
+    <header>
+      <img
+        src="{{ url_for('static', filename='images/logo.png') }}"
+        alt="Dairy Shop Logo"
+        class="logo"
+      />
+      <div class="menu-container">
+        {% if session.get('user_type') == 'admin' %}
+        <!-- Admin Header -->
+        <div class="user-dropdown">
+          <button class="user-btn" onclick="toggleUserMenu()">
+            Welcome, {{ session.get('username') }}!
+            <span class="dropdown-arrow">▼</span>
+          </button>
+          <div class="user-menu" id="userMenu">
+            <a href="{{ url_for('auth.profile') }}" class="menu-item active"
+              >Profile</a
+            >
+            <a href="{{ url_for('admin.admin_panel') }}" class="menu-item"
+              >Admin Panel</a
+            >
+            <a href="{{ url_for('auth.logout') }}" class="menu-item logout"
+              >Logout</a
+            >
+          </div>
+        </div>
+        {% else %}
+        <!-- User Header -->
+        <a href="{{ url_for('cart.view_cart') }}" class="cart-btn">Cart</a>
+        <div class="user-dropdown">
+          <button class="user-btn" onclick="toggleUserMenu()">
+            Welcome! {{ session.get('first_name', session.get('username')) }}
+            <span class="dropdown-arrow">▼</span>
+          </button>
+          <div class="user-menu" id="userMenu">
+            <div class="user-info">
+              <span class="user-name"
+                >{{ session.get('first_name', session.get('username')) }}</span
+              >
+              <span class="user-email">{{ session.get('email', '') }}</span>
+            </div>
+            <a href="{{ url_for('auth.profile') }}" class="menu-item active"
+              >Profile</a
+            >
+            <a href="{{ url_for('product.index') }}" class="menu-item">Home</a>
+            <a href="{{ url_for('product.products') }}" class="menu-item"
+              >Products</a
+            >
+            <a href="{{ url_for('feedback.feedback') }}" class="menu-item"
+              >Feedback</a
+            >
+            <a href="{{ url_for('auth.logout') }}" class="menu-item logout"
+              >Logout</a
+            >
+          </div>
+        </div>
+        {% endif %}
+      </div>
+    </header>
+
+    <div class="profile-container">
+      <div class="profile-card">
+        <div class="profile-header">
+          <h1>Profile</h1>
+          <p>Manage your account information</p>
+        </div>
+
+        <!-- Flash Messages -->
+        {% with messages = get_flashed_messages(with_categories=true) %} {% if
+        messages %}
+        <div class="flash-messages">
+          {% for category, message in messages %}
+          <div class="flash-message {{ category }}">{{ message }}</div>
+          {% endfor %}
+        </div>
+        {% endif %} {% endwith %}
+
+        <div class="profile-content">
+          <!-- Profile Information Display -->
+          <div class="profile-section">
+            <h2>Personal Information</h2>
+            <div class="info-grid">
+              <div class="info-item">
+                <label>Username:</label>
+                <span>{{ user.username }}</span>
+              </div>
+              <div class="info-item">
+                <label>Email:</label>
+                <span>{{ user.email }}</span>
+              </div>
+              <div class="info-item">
+                <label>First Name:</label>
+                <span>{{ user.first_name or 'Not set' }}</span>
+              </div>
+              <div class="info-item">
+                <label>Last Name:</label>
+                <span>{{ user.last_name or 'Not set' }}</span>
+              </div>
+              <div class="info-item">
+                <label>Phone:</label>
+                <span>{{ user.phone or 'Not set' }}</span>
+              </div>
+              <div class="info-item">
+                <label>Address:</label>
+                <span>{{ user.address or 'Not set' }}</span>
+              </div>
+              <div class="info-item">
+                <label>Member Since:</label>
+                <span
+                  >{{ user.created_at.strftime('%B %d, %Y') if user.created_at
+                  else 'Unknown' }}</span
+                >
+              </div>
+            </div>
+          </div>
+
+          <!-- Update Profile Form -->
+          <div class="profile-section">
+            <h2>Update Profile</h2>
+            <form
+              method="POST"
+              action="{{ url_for('auth.edit_profile') }}"
+              class="profile-form"
+            >
+              <div class="form-group">
+                <label for="first_name">First Name:</label>
+                <input
+                  type="text"
+                  id="first_name"
+                  name="first_name"
+                  value="{{ user.first_name or '' }}"
+                  placeholder="Enter your first name"
+                />
+              </div>
+
+              <div class="form-group">
+                <label for="last_name">Last Name:</label>
+                <input
+                  type="text"
+                  id="last_name"
+                  name="last_name"
+                  value="{{ user.last_name or '' }}"
+                  placeholder="Enter your last name"
+                />
+              </div>
+
+              <div class="form-group">
+                <label for="phone">Phone:</label>
+                <input
+                  type="tel"
+                  id="phone"
+                  name="phone"
+                  value="{{ user.phone or '' }}"
+                  placeholder="Enter your phone number"
+                />
+              </div>
+
+              <div class="form-group">
+                <label for="address">Address:</label>
+                <textarea
+                  id="address"
+                  name="address"
+                  rows="3"
+                  placeholder="Enter your address"
+                >
+{{ user.address or '' }}</textarea
+                >
+              </div>
+
+              <button type="submit" class="btn btn-primary">
+                Update Profile
+              </button>
+            </form>
+          </div>
+
+          <!-- Change Password Form -->
+          <div class="profile-section">
+            <h2>Change Password</h2>
+            <form
+              method="POST"
+              action="{{ url_for('auth.change_password') }}"
+              class="password-form"
+            >
+              <div class="form-group">
+                <label for="current_password">Current Password:</label>
+                <input
+                  type="password"
+                  id="current_password"
+                  name="current_password"
+                  required
+                  placeholder="Enter your current password"
+                />
+              </div>
+
+              <div class="form-group">
+                <label for="new_password">New Password:</label>
+                <input
+                  type="password"
+                  id="new_password"
+                  name="new_password"
+                  required
+                  placeholder="Enter your new password"
+                />
+              </div>
+
+              <div class="form-group">
+                <label for="confirm_password">Confirm New Password:</label>
+                <input
+                  type="password"
+                  id="confirm_password"
+                  name="confirm_password"
+                  required
+                  placeholder="Confirm your new password"
+                />
+              </div>
+
+              <button type="submit" class="btn btn-secondary">
+                Change Password
+              </button>
+            </form>
+          </div>
+
+          <!-- Account Actions -->
+          <div class="profile-section">
+            <h2>Account Actions</h2>
+            <div class="action-buttons">
+              <a href="{{ url_for('product.index') }}" class="btn btn-outline"
+                >Back to Home</a
+              >
+              <a href="{{ url_for('auth.logout') }}" class="btn btn-danger"
+                >Logout</a
+              >
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      // Toast Notification
+      function showToast(message, type = 'success') {
+          const toast = document.getElementById('toast');
+          if (!toast) return;
+          toast.textContent = message;
+          toast.className = `toast show ${type}`;
+          setTimeout(() => {
+              toast.className = toast.className.replace('show', '');
+          }, 3000);
+      }
+
+      // User dropdown functionality
+      function toggleUserMenu() {
+          const userMenu = document.getElementById('userMenu');
+          if (userMenu) userMenu.classList.toggle('active');
+      }
+
+      // Close user menu when clicking outside
+      document.addEventListener('click', function(event) {
+          const userDropdown = document.querySelector('.user-dropdown');
+          const userMenu = document.getElementById('userMenu');
+          if (userDropdown && userMenu && !userDropdown.contains(event.target)) {
+              userMenu.classList.remove('active');
+          }
+      });
+
+      document.addEventListener('DOMContentLoaded', function() {
+          // Password confirmation validation
+          const passwordForm = document.querySelector('.password-form');
+          if (passwordForm) {
+              passwordForm.addEventListener('submit', function(e) {
+                  const newPassword = document.getElementById('new_password').value;
+                  const confirmPassword = document.getElementById('confirm_password').value;
+
+                  if (newPassword !== confirmPassword) {
+                      e.preventDefault();
+                      showToast('New passwords do not match!', 'error');
+                  } else if (newPassword.length > 0 && newPassword.length < 6) {
+                      e.preventDefault();
+                      showToast('Password must be at least 6 characters long!', 'error');
+                  }
+              });
+          }
+      });
+
+      // Display flashed messages as toasts
+      {% with messages = get_flashed_messages(with_categories=true) %}
+          {% if messages %}
+              window.addEventListener('DOMContentLoaded', () => {
+                  {% for category, message in messages %}
+                      showToast("{{ message }}", "{{ category }}");
+                  {% endfor %}
+              });
+          {% endif %}
+      {% endwith %}
+    </script>
+  </body>
+</html>

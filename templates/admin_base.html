@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>{% block title %}Admin Panel{% endblock %}</title>
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='admin.css') }}"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css"
+    />
+  </head>
+  <body>
+    <header class="admin-header">
+      <div class="header-logo">
+        <img
+          src="{{ url_for('static', filename='images/logo.png') }}"
+          alt="KrishnaKath Dairy Logo"
+        />
+        <span>Admin Panel</span>
+      </div>
+      <div class="header-user-menu">
+        <a href="{{ url_for('auth.logout') }}">Logout</a>
+      </div>
+    </header>
+
+    <div class="admin-container">
+      <aside class="admin-sidebar">
+        <nav>
+          <a
+            href="{{ url_for('admin.admin_panel') }}"
+            class="nav-link {% if 'admin_panel' in request.endpoint %}active{% endif %}"
+          >
+            <i class="fas fa-tachometer-alt"></i><span>Dashboard</span>
+          </a>
+          <a
+            href="{{ url_for('admin.admin_products') }}"
+            class="nav-link {% if 'products' in request.endpoint %}active{% endif %}"
+          >
+            <i class="fas fa-box"></i><span>Products</span>
+          </a>
+          <a
+            href="{{ url_for('admin.admin_orders') }}"
+            class="nav-link {% if 'orders' in request.endpoint %}active{% endif %}"
+          >
+            <i class="fas fa-receipt"></i><span>Orders</span>
+          </a>
+          <a
+            href="{{ url_for('feedback.admin_feedback') }}"
+            class="nav-link {% if 'feedback' in request.endpoint %}active{% endif %}"
+          >
+            <i class="fas fa-comment-dots"></i><span>Feedback</span>
+          </a>
+        </nav>
+      </aside>
+      <main class="admin-main-content">
+        {% with messages = get_flashed_messages(with_categories=true) %} {% if
+        messages %}
+        <div class="flash-messages">
+          {% for category, message in messages %}
+          <div class="alert alert-{{ category }}">{{ message }}</div>
+          {% endfor %}
+        </div>
+        {% endif %} {% endwith %} {% block content %}{% endblock %}
+      </main>
+    </div>
+  </body>
+</html>

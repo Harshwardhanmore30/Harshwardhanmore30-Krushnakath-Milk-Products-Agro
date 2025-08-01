@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Feedback - Krishnakath Dairy</title>
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='index.css') }}"
+    />
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='feedback.css') }}"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.0/css/all.min.css"
+    />
+  </head>
+  <body>
+    <!-- Toast Notification -->
+    <div id="toast" class="toast"></div>
+
+    {% include 'includes/header.html' %}
+
+    <div class="container">
+      <h1>Customer Feedback</h1>
+      <form
+        id="feedbackForm"
+        method="POST"
+        action="{{ url_for('feedback.feedback') }}"
+      >
+        <div class="form-group">
+          <label for="name">Full Name</label>
+          <input
+            type="text"
+            id="name"
+            name="name"
+            required
+            placeholder="Enter your full name"
+          />
+        </div>
+        <div class="form-group">
+          <label for="email">Email Address</label>
+          <input
+            type="email"
+            id="email"
+            name="email"
+            required
+            placeholder="Enter your email"
+          />
+        </div>
+        <div class="form-group">
+          <label for="message">Your Feedback</label>
+          <textarea
+            id="message"
+            name="message"
+            required
+            placeholder="Share your thoughts about our dairy products and services"
+          ></textarea>
+        </div>
+        <div class="button-container">
+          <button type="submit" class="submit-btn">Submit Feedback</button>
+        </div>
+      </form>
+    </div>
+
+    <script>
+      // Toast Notification
+      function showToast(message, type = 'success') {
+          const toast = document.getElementById('toast');
+          if (!toast) return;
+          toast.textContent = message;
+          toast.className = `toast show ${type}`;
+          setTimeout(() => {
+              toast.className = toast.className.replace('show', '');
+          }, 3000);
+      }
+
+      // User dropdown functionality
+      function toggleUserMenu() {
+          const userMenu = document.getElementById('userMenu');
+          if (userMenu) userMenu.classList.toggle('active');
+      }
+
+      // Hamburger menu functionality
+      function toggleMenu() {
+          const dropdownMenu = document.getElementById('dropdownMenu');
+          if (dropdownMenu) dropdownMenu.classList.toggle('active');
+      }
+
+      // Close user menu when clicking outside
+      document.addEventListener('click', function(event) {
+          const userDropdown = document.querySelector('.user-dropdown');
+          const userMenu = document.getElementById('userMenu');
+          if (userDropdown && userMenu && !userDropdown.contains(event.target)) {
+              userMenu.classList.remove('active');
+          }
+      });
+
+      // Display flashed messages as toasts
+      {% with messages = get_flashed_messages(with_categories=true) %}
+          {% if messages %}
+              window.addEventListener('DOMContentLoaded', () => {
+                  {% for category, message in messages %}
+                      showToast("{{ message }}", "{{ category }}");
+                  {% endfor %}
+              });
+          {% endif %}
+      {% endwith %}
+    </script>
+  </body>
+</html>

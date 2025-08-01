@@ -1,0 +1,65 @@
+{% extends "admin_base.html" %} {% block title %}Dashboard{% endblock %} {%
+block content %}
+<div class="content-header">
+  <h2>Admin Dashboard - Update Stock</h2>
+</div>
+
+<form
+  method="POST"
+  action="{{ url_for('admin.admin_panel') }}"
+  class="stock-form"
+>
+  <div class="table-container">
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>Product</th>
+          <th>Image</th>
+          <th>Price</th>
+          <th>Current Stock</th>
+          <th>Update Stock</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for product in products %}
+        <tr>
+          <td>{{ product.name }}</td>
+          <td>
+            <img
+              src="{{ url_for('static', filename='images/' + product.image) }}"
+              alt="{{ product.name }}"
+              class="admin-product-img"
+            />
+          </td>
+          <td>₹{{ product.price }}</td>
+          <td>{{ product.stock }}</td>
+          <td>
+            <input
+              type="number"
+              name="stock_{{ product.id }}"
+              value="{{ product.stock }}"
+              min="0"
+              class="stock-input"
+            />
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  <button type="submit" class="btn btn-primary">Update All Stock</button>
+</form>
+
+<div class="low-stock-alerts">
+  <h3>Low Stock Alerts</h3>
+  {% if low_stock_products %}
+  <ul class="low-stock-list">
+    {% for product in low_stock_products %}
+    <li>{{ product.name }} - Only {{ product.stock }} left in stock!</li>
+    {% endfor %}
+  </ul>
+  {% else %}
+  <p>All products have sufficient stock.</p>
+  {% endif %}
+</div>
+{% endblock %}

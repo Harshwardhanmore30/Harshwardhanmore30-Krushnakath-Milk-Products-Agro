@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='product.css') }}"
+    />
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='index.css') }}"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;700&display=swap"
+      rel="stylesheet"
+    />
+    <title>{{ product['name'] }}</title>
+    <script>
+      // Object to store the price multipliers for liquid and solid products
+      const priceMultipliers = {
+        liquid: { "100ml": 0.1, "500ml": 0.5, "1L": 1 },
+        solid: { "100g": 0.1, "500g": 0.5, "1kg": 1 },
+      };
+
+      // Function to update price dynamically based on selected size and quantity
+      function updatePrice() {
+        const size = document.getElementById("size").value; // Get selected size
+        const quantity = document.getElementById("quantity").value; // Get entered quantity
+
+        let pricePerUnit = 0;
+
+        // Check if the product is liquid or solid and calculate the price per unit
+        if (
+          ["Milk", "Lassi", "ButterMilk", "Ghee", "CowGhee"].includes(
+            "{{ product['name'] }}"
+          )
+        ) {
+          pricePerUnit = priceMultipliers["liquid"][size];
+        } else {
+          pricePerUnit = priceMultipliers["solid"][size];
+        }
+
+        // Calculate the total price
+        const totalPrice = pricePerUnit * quantity * "{{ product['price'] }}";
+
+        // Display the updated price
+        document.getElementById("updated-price").innerText =
+          "₹" + totalPrice.toFixed(2);
+      }
+    </script>
+  </head>
+  <body>
+    <!-- Toast Notification -->
+    <div id="toast" class="toast"></div>
+
+    <!-- Header with Navigation -->
+    {% include 'includes/header.html' %}
+
+    <!-- Main Product Details Section -->
+    <div class="container">
+      <div class="product-details">
+        <img
+          src="{{ url_for('static', filename='images/' + product['image']) }}"
+          alt="{{ product['name'] }}"
+          loading="lazy"
+        />
+        <h2>{{ product.name }}</h2>
+        <p>{{ product.description }}</p>
+        <p>Stock: {{ product['stock'] }}</p>
+
+        <p class="price">
+          ₹{{ product.price }} {% if product.name in ['Milk', 'Lassi',
+          'ButterMilk', 'Ghee', 'CowGhee'] %} per liter<br />
+          {% if product.name in ['Milk', 'Lassi']%} Best before 5 days from
+          Manufacturing {% elif product.name in ['Ghee', 'CowGhee']%} Best
+          before 120 days from Manufacturing {% endif %} {% elif product.name
+          in ['Paneer', 'Shrikhand', 'Basundi', 'Amrkhand', 'Dahi', 'Khawa',
+          'Kandhi Peda'] %} per kg<br />
+          Best before 120 days from Manufacturing {% endif %}
+        </p>
+
+        {% if product['stock'] > 0 %}
+          {% if session.get('username') %}
+          <form
+            method="POST"
+            action="{{ url_for('cart.add_to_cart', product_id=product['id']) }}"
+          >
+            <!-- Dropdown for size selection -->
+            <label for="size">Size:</label>
+            <select name="size" id="size" required onchange="updatePrice()">
+              {% if product.name in ['Milk', 'Lassi', 'ButterMilk', 'Ghee',
+              'CowGhee'] %}
+              <option value="100ml">100 ml</option>
+              <option value="500ml">500 ml</option>
+              <option value="1L">1 L</option>
+              {% else %}
+              <option value="100g">100 g</option>
+              <option value="500g">500 g</option>
+              <option value="1kg">1 kg</option>
+              {% endif %}
+            </select>
+
+            <!-- Input for quantity -->
+            <label for="quantity">Quantity:</label>
+            <input
+              type="number"
+              name="quantity"
+              id="quantity"
+              value="1"
+              min="1"
+              required
+              onchange="updatePrice()"
+            />
+
+            <!-- Display the dynamically updated price -->
+            <p id="updated-price"></p>
+
+            <!-- Add to Cart button -->
+            <button type="submit" class="btn">Add to Cart</button>
+          </form>
+          {% else %}
+          <div class="login-prompt">
+            <p>Please <a href="{{ url_for('auth.login') }}" class="btn">Login</a> to add items to cart</p>
+          </div>
+          {% endif %}
+        {% else %}
+          <button class="btn" disabled>Out of Stock</button>
+        {% endif %}
+
+        <h3>Product Specifications</h3>
+        {% if table %}
+        <div class="table-section">
+          <table>
+            <thead>
+              <tr>
+                <th>Feature</th>
+                <th>Value</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for row in table %}
+              <tr>
+                <td>{{ row.Feature }}</td>
+                <td>{{ row.Value }}</td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+        {% else %}
+        <p>No product specifications available.</p>
+        {% endif %}
+        <div class="footer-btns">
+          <a href="{{ url_for('product.index') }}" class="btn"
+            >Continue Shopping</a
+          >
+        </div>
+      </div>
+
+      <h3>Recommended Products</h3>
+      <div class="products">
+        {% for rec in recommendations %}
+        <a
+          href="{{ url_for('product.product_detail', product_id=rec.id) }}"
+          class="product-card-link"
+        >
+          <div class="product-card">
+            <img
+              src="{{ url_for('static', filename='images/' + rec.image) }}"
+              alt="{{ rec.name }}"
+            />
+            <h4>{{ rec.name }}</h4>
+            <p class="price">₹{{ "%.2f"|format(rec.price) }}</p>
+          </div>
+        </a>
+        {% endfor %}
+      </div>
+    </div>
+
+    <script>
+      // Toast Notification
+      function showToast(message, type = 'success') {
+          const toast = document.getElementById('toast');
+          if (!toast) return;
+          toast.textContent = message;
+          toast.className = `toast show ${type}`;
+          setTimeout(() => {
+              toast.className = toast.className.replace('show', '');
+          }, 3000);
+      }
+
+      // User dropdown functionality
+      function toggleUserMenu() {
+          const userMenu = document.getElementById('userMenu');
+          if (userMenu) userMenu.classList.toggle('active');
+      }
+
+      // Hamburger menu functionality
+      function toggleMenu() {
+          const dropdownMenu = document.getElementById('dropdownMenu');
+          if (dropdownMenu) dropdownMenu.classList.toggle('active');
+      }
+
+      // Close user menu when clicking outside
+      document.addEventListener('click', function(event) {
+          const userDropdown = document.querySelector('.user-dropdown');
+          const userMenu = document.getElementById('userMenu');
+          if (userDropdown && userMenu && !userDropdown.contains(event.target)) {
+              userMenu.classList.remove('active');
+          }
+      });
+
+      // Display flashed messages as toasts
+      {% with messages = get_flashed_messages(with_categories=true) %}
+          {% if messages %}
+              window.addEventListener('DOMContentLoaded', () => {
+                  {% for category, message in messages %}
+                      showToast("{{ message }}", "{{ category }}");
+                  {% endfor %}
+              });
+          {% endif %}
+      {% endwith %}
+    </script>
+  </body>
+</html>

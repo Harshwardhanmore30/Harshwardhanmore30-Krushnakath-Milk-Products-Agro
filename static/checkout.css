@@ -1,0 +1,287 @@
+/* General Body and Font Styles */
+body {
+  font-family: "Montserrat", sans-serif;
+  background-color: #f9f9f9;
+  color: #333;
+  margin: 0;
+  padding-top: 70px; /* Account for smaller fixed header */
+}
+
+.checkout-container {
+  width: 90%;
+  max-width: 1200px;
+  margin: 2rem auto;
+  padding: 2rem;
+}
+
+.checkout-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2rem;
+  border-bottom: 1px solid #ddd;
+  padding-bottom: 1rem;
+}
+
+.checkout-header h1 {
+  font-size: 2.5rem;
+  color: #333;
+}
+
+.back-to-cart {
+  text-decoration: none;
+  color: #28a745;
+  font-weight: bold;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  transition: color 0.3s;
+}
+
+.back-to-cart:hover {
+  color: #218838;
+}
+
+/* Two-column layout for the checkout body */
+.checkout-body {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 2rem;
+}
+
+@media (min-width: 992px) {
+  .checkout-body {
+    grid-template-columns: 2fr 1fr;
+  }
+}
+
+/* Shipping Details Form */
+.shipping-details {
+  background: #fff;
+  padding: 2rem;
+  border-radius: 8px;
+  box-shadow: 0 4px 15px rgba(228, 220, 220, 0.05);
+}
+
+.shipping-details h2 {
+  margin-top: 0;
+  margin-bottom: 1.5rem;
+  font-size: 1.8rem;
+  color: #333;
+}
+
+.form-group {
+  margin-bottom: 1.5rem;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 0.5rem;
+  font-weight: bold;
+  color: #555;
+}
+
+.form-group input,
+.form-group textarea {
+  width: 100%;
+  padding: 0.8rem 1rem;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  font-size: 1rem;
+  transition: border-color 0.3s, box-shadow 0.3s;
+}
+
+.form-group input:focus,
+.form-group textarea:focus {
+  outline: none;
+  border-color: #28a745;
+  box-shadow: 0 0 0 3px rgba(40, 167, 69, 0.1);
+}
+
+/* Override browser autofill styles using a JS-applied class */
+.shipping-form .form-group input.is-autofilled,
+.shipping-form .form-group input.is-autofilled:hover,
+.shipping-form .form-group input.is-autofilled:focus,
+.shipping-form .form-group input.is-autofilled:active {
+  -webkit-box-shadow: 0 0 0 30px white inset !important;
+  -webkit-text-fill-color: #333 !important;
+}
+
+.form-group textarea {
+  resize: vertical;
+  min-height: 100px;
+}
+
+/* Order Summary Card */
+.order-summary .summary-card {
+  background: #fff;
+  padding: 2rem;
+  border-radius: 8px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+  position: sticky;
+  top: 100px; /* Sticks below the header */
+}
+
+.summary-card h2 {
+  margin-top: 0;
+  margin-bottom: 1.5rem;
+  font-size: 1.8rem;
+  border-bottom: 1px solid #eee;
+  padding-bottom: 1rem;
+}
+
+.summary-items {
+  margin-bottom: 1.5rem;
+  max-height: 300px;
+  overflow-y: auto;
+  padding-right: 10px;
+}
+
+.summary-item {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.item-image {
+  width: 60px;
+  height: 60px;
+  object-fit: cover;
+  border-radius: 4px;
+  border: 1px solid #eee;
+}
+
+.item-info {
+  flex-grow: 1;
+}
+
+.item-name {
+  display: block;
+  font-weight: bold;
+}
+
+.item-quantity {
+  font-size: 0.9rem;
+  color: #777;
+}
+
+.item-price {
+  font-weight: bold;
+  white-space: nowrap;
+}
+
+.summary-line,
+.summary-total {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 1rem;
+  padding: 1rem 0;
+  border-top: 1px solid #eee;
+}
+
+.summary-total {
+  font-size: 1.2rem;
+  font-weight: bold;
+  color: #333;
+}
+
+.btn-checkout {
+  display: block;
+  width: 100%;
+  padding: 1rem;
+  background-color: #28a745;
+  color: #fff;
+  border: none;
+  border-radius: 4px;
+  font-size: 1.2rem;
+  font-weight: bold;
+  text-align: center;
+  cursor: pointer;
+  transition: background-color 0.3s;
+  text-decoration: none;
+}
+
+.btn-checkout:hover {
+  background-color: #218838;
+}
+
+/* Cart count in header */
+.cart-count {
+  background-color: #ff4d4d;
+  color: white;
+  border-radius: 50%;
+  padding: 0.2em 0.5em;
+  font-size: 0.8rem;
+  vertical-align: top;
+  margin-left: 5px;
+}
+
+/* Payment Modal Styles */
+.modal {
+  display: none; /* Hidden by default */
+  position: fixed;
+  z-index: 1000;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  overflow: auto;
+  background-color: rgba(0, 0, 0, 0.6);
+}
+
+.modal-content {
+  background-color: #fefefe;
+  margin: 10% auto;
+  padding: 2rem;
+  border: 1px solid #888;
+  width: 90%;
+  max-width: 500px;
+  border-radius: 8px;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+  position: relative;
+  text-align: center;
+}
+
+.close-btn {
+  color: #aaa;
+  position: absolute;
+  top: 10px;
+  right: 20px;
+  font-size: 28px;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.close-btn:hover,
+.close-btn:focus {
+  color: black;
+  text-decoration: none;
+}
+
+.qr-code-img {
+  width: 200px;
+  height: 200px;
+  margin: 1rem auto;
+  display: block;
+  border: 1px solid #ddd;
+  padding: 5px;
+}
+
+#confirmation-step .form-group {
+  text-align: left;
+}
+
+.btn-primary {
+  background-color: #007bff;
+  color: white;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 1rem;
+}
+
+.btn-primary:hover {
+  background-color: #0056b3;
+}

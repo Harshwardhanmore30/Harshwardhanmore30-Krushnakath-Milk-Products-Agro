@@ -1,0 +1,532 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <link rel="stylesheet" href="{{ url_for('static', filename='index.css') }}">
+    <title>KrishnaKath Dairy</title>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;700&display=swap"
+      rel="stylesheet"
+    />
+    
+  </head>
+  <body>
+    <!-- Toast Notification -->
+    <div id="toast" class="toast"></div>
+    
+    {% set home_nav = True %}
+    {% include 'includes/header.html' %}
+
+    <section id="home">
+      <headline class="headline">
+      <h1>Welcome to the KrishnaKath Dairy</h1>
+    </headline>
+  
+      <section class="banner">
+        <div class="banner-content">
+        
+          <div class="container1">
+            <div class="slide1">
+              <div class="item">
+                <img src="/static/images/dairy.png" alt="Switzerland">
+               
+            </div>
+              <div class="item">
+                <img src="/static/images/dairy1.png" alt="Switzerland">
+               
+            </div>
+              <div class="item">
+                <img src="/static/images/dairy2.png" alt="Switzerland">
+                
+            </div>
+                <div class="item">
+                  <img src="/static/images/dairy3.png" alt="Switzerland">
+                  
+              </div>
+             
+             
+            </div>
+  
+            <div class="button">
+              <button class="prev"><i class="fa-solid fa-arrow-right"></i></button>
+              <button class="next"><i class="fa-solid fa-arrow-left"></i></button>
+            </div>
+        </div>
+      </section>
+      <headline class="headline1">
+        <h1>Our Products</h1>
+      </headline>
+      <div class="products">
+        
+        {% for product in products %}
+        <a
+          href="{{ url_for('product.product_detail', product_id=product.id) }}"
+          class="product-card"
+        >
+          <div class="product-image">
+            <img
+              src="{{ url_for('static', filename='images/' + product.image) }}"
+              alt="{{ product.name }}"
+            />
+          </div>
+          <div class="product-details">
+            <h3>{{ product.name }}</h3>
+            <p>₹{{ product.price }}</p>
+          </div>
+        </a>
+        {% endfor %}
+      </div>
+    </section>
+
+    <section id="backimg">
+    <section id="features">
+      <div class="feature-section">
+        <h2>Why Choose Our Dairy?</h2>
+        <div class="features">
+          <div class="feature">
+            <img src="/static/images/pure.png" alt="100% Pure" />
+            <h3>100% Pure</h3>
+            <p>Our products are made from the freshest, purest milk</p>
+          </div>
+          <div class="feature">
+            <img src="../static/images/natural.png" alt="All Natural" />
+            <h3>All Natural</h3>
+            <p>No artificial additives or preservatives, ever</p>
+          </div>
+          <div class="feature">
+            <img src="../static/images/sunny.png" alt="Farm Fresh" />
+            <h3>Farm Fresh</h3>
+            <p>From our farms to your table within 24 hours</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="about">
+      <div class="about-content">
+    <section id="features">
+      <div class="feature-section">
+        <h2>Board Of Directors</h2>
+        <div class="container">
+          <div class="top-director">
+            <img src="../static/images/BOD5.png" class="directors" alt="Farm Fresh" />
+            <h3>Mr. Sangram Rajendra Patil</h3>
+          </div>
+          
+          <div id="BOD" class="BOD">
+            <div class="director">
+              <img src="../static/images/BOD1.png" class="directors" alt="100% Pure" />
+              <h3>Mr. Nilesh Manikrao Chavan</h3>
+            </div>
+            <div class="director">
+              <img src="../static/images/BOD2.png" class="directors" alt="All Natural" />
+              <h3>Mr. Mangesh Pandharinath Thorat</h3>
+            </div>
+            <div class="director">
+              <img src="../static/images/BOD4.png" class="directors" alt="Farm Fresh" />
+              <h3>Ms. Rohini Dhanaji Ghadge</h3>
+            </div>
+            <div class="director">
+              <img src="../static/images/BOD3.png" class="directors" alt="Farm Fresh" />
+              <h3>Mr. Santosh Rajendra Patil</h3>
+            </div>
+          </div>
+        </div>
+        
+      </div>
+      
+     
+      <div class="slider-container">
+        <div class="slide active">
+            <img src="/static/images/G1.jpeg" alt="Image 1">
+        </div>
+        <div class="slide">
+            <img src="/static/images/G2.jpeg" alt="Image 2">
+        </div>
+        <div class="slide">
+            <img src="/static/images/G3.jpeg" alt="Image 3">
+        </div>
+        <div class="slide">
+            <img src="/static/images/G4.jpeg" alt="Image 4">
+        </div>
+        <div class="slide">
+            <img src="/static/images/G5.jpeg" alt="Image 5">
+        </div>
+        
+        <button class="prev">❮</button>
+        <button class="next">❯</button>
+        
+        <div class="dots-container">
+            <button class="dot active"></button>
+            <button class="dot"></button>
+            <button class="dot"></button>
+            <button class="dot"></button>
+            <button class="dot"></button>
+        </div>
+
+        <div class="slide-number">1 / 5</div>
+    </div>
+
+    <div id="board" class="board">
+      <div class="award-card">
+        <div style="position: relative;">
+          <img src="/static/images/Cap1.jpeg" alt="Krushibhushan Award">
+          <span class="award-badge">2023</span>
+        </div>
+        <p>Aastha state level Agri Award = Krushibhushan Award <br>2023<br>.</p>
+      </div>
+      
+      <div class="award-card">
+        <div style="position: relative;">
+          <img src="/static/images/Cap2.jpeg" alt="National Agripreneurship Award">
+          <span class="award-badge">2019</span>
+        </div>
+        <p>Govt.of India. Central ministry of Agriculture and farmer welfare<br>
+           National Agripreneurship award.<br>
+           National Best Agripreneure Award-2019</p>
+      </div>
+    </section>
+  </div>
+</section>
+ </section>
+    <section id="contact">
+      <footer>
+        <div class="important-links">
+          <h3>IMPORTANT LINKS</h3>
+          <ul>
+            <li><a href="#">Events</a></li>
+            <li><a href="#">Awards</a></li>
+            <li><a href="#">Board Of Directors</a></li>
+            <li><a href="{{ url_for('feedback.feedback') }}">Feedback</a></li>
+          </ul>
+        </div>
+        <div class="contact-info">
+          <h3>CONTACT INFO</h3>
+          <p>+91-9359080465</p>
+          <p>KrishnaKath Dairy, karad - Satara Highway,<br>
+          Opp. VITs Hotel,<br>
+          karad, Satara - 415110.</p>
+          <p>KrishnaKathdairy@gmail.com</p>
+        </div>
+      </footer>
+    </section>
+ 
+
+<script>
+      let currentIndex = 0;
+
+      function slideLeft() {
+        const slider = document.getElementById("sliderContainer");
+        const slides = slider.children;
+        currentIndex = currentIndex > 0 ? currentIndex - 1 : slides.length - 1;
+        slider.style.transform = `translateX(-${currentIndex * 100}%)`;
+      }
+
+      function slideRight() {
+        const slider = document.getElementById("sliderContainer");
+        const slides = slider.children;
+        currentIndex = currentIndex < slides.length - 1 ? currentIndex + 1 : 0;
+        slider.style.transform = `translateX(-${currentIndex * 100}%)`;
+      }
+
+      function toggleMenu() {
+        const hamburgerBtn = document.querySelector(".hamburger-btn");
+        const dropdownMenu = document.getElementById("dropdownMenu");
+
+        hamburgerBtn.classList.toggle("active");
+        dropdownMenu.classList.toggle("active");
+      }
+
+      // Close menu when clicking outside
+      document.addEventListener("click", function (event) {
+        const hamburgerBtn = document.querySelector(".hamburger-btn");
+        const dropdownMenu = document.getElementById("dropdownMenu");
+
+        if (
+          !hamburgerBtn.contains(event.target) &&
+          !dropdownMenu.contains(event.target)
+        ) {
+          hamburgerBtn.classList.remove("active");
+          dropdownMenu.classList.remove("active");
+        }
+      });
+    </script>
+ <script>
+  function toggleMenu() {
+    const btn = document.querySelector('.hamburger-btn');
+    const menu = document.getElementById('dropdownMenu');
+    btn.classList.toggle('active');
+    menu.classList.toggle('active');
+  }
+</script>
+<script>
+  // Banner Slider (First Slider)
+let bannerSlideInterval;
+
+function initBannerSlider() {
+  const slide = document.querySelector('.slide1');
+  const nextBtn = document.querySelector('.banner .next');
+  const prevBtn = document.querySelector('.banner .prev');
+
+  function moveToNextSlide() {
+    const items = document.querySelectorAll('.item');
+    if (items.length > 0) {
+      slide.appendChild(items[0]);
+    }
+  }
+
+  function moveToPrevSlide() {
+    const items = document.querySelectorAll('.item');
+    if (items.length > 0) {
+      slide.prepend(items[items.length - 1]);
+    }
+  }
+
+  function startBannerAutoSlide() {
+    if (bannerSlideInterval) {
+      clearInterval(bannerSlideInterval);
+    }
+    bannerSlideInterval = setInterval(moveToNextSlide, 2500);
+  }
+
+  function stopBannerAutoSlide() {
+    if (bannerSlideInterval) {
+      clearInterval(bannerSlideInterval);
+    }
+  }
+
+  // Event listeners for banner slider
+  nextBtn.addEventListener('click', () => {
+    moveToNextSlide();
+    stopBannerAutoSlide();
+    startBannerAutoSlide();
+  });
+
+  prevBtn.addEventListener('click', () => {
+    moveToPrevSlide();
+    stopBannerAutoSlide();
+    startBannerAutoSlide();
+  });
+
+  slide.addEventListener('mouseenter', stopBannerAutoSlide);
+  slide.addEventListener('mouseleave', startBannerAutoSlide);
+
+  // Start banner auto-sliding
+  startBannerAutoSlide();
+}
+
+// Gallery Slider (Second Slider)
+let gallerySlideInterval;
+
+function initGallerySlider() {
+  const sliderContainer = document.querySelector('.slider-container');
+  const slides = sliderContainer.querySelectorAll('.slide');
+  const dots = sliderContainer.querySelectorAll('.dot');
+  const prevButton = sliderContainer.querySelector('.prev');
+  const nextButton = sliderContainer.querySelector('.next');
+  let currentSlide = 0;
+  const totalSlides = slides.length;
+
+  function updateSlideDisplay() {
+    slides.forEach(slide => slide.classList.remove('active'));
+    dots.forEach(dot => dot.classList.remove('active'));
+    
+    slides[currentSlide].classList.add('active');
+    dots[currentSlide].classList.add('active');
+    
+    const slideNumber = sliderContainer.querySelector('.slide-number');
+    if (slideNumber) {
+      slideNumber.textContent = `${currentSlide + 1} / ${totalSlides}`;
+    }
+  }
+
+  function nextSlide() {
+    currentSlide = (currentSlide + 1) % totalSlides;
+    updateSlideDisplay();
+  }
+
+  function previousSlide() {
+    currentSlide = (currentSlide - 1 + totalSlides) % totalSlides;
+    updateSlideDisplay();
+  }
+
+  function goToSlide(index) {
+    if (index >= 0 && index < totalSlides) {
+      currentSlide = index;
+      updateSlideDisplay();
+      resetGalleryTimer();
+    }
+  }
+
+  function startGalleryAutoSlide() {
+    if (gallerySlideInterval) {
+      clearInterval(gallerySlideInterval);
+    }
+    gallerySlideInterval = setInterval(nextSlide, 2500);
+  }
+
+  function resetGalleryTimer() {
+    clearInterval(gallerySlideInterval);
+    startGalleryAutoSlide();
+  }
+
+  // Event Listeners for gallery slider
+  prevButton.addEventListener('click', (e) => {
+    e.preventDefault();
+    previousSlide();
+    resetGalleryTimer();
+  });
+
+  nextButton.addEventListener('click', (e) => {
+    e.preventDefault();
+    nextSlide();
+    resetGalleryTimer();
+  });
+
+  dots.forEach((dot, index) => {
+    dot.addEventListener('click', () => goToSlide(index));
+  });
+
+  sliderContainer.addEventListener('mouseenter', () => {
+    clearInterval(gallerySlideInterval);
+  });
+
+  sliderContainer.addEventListener('mouseleave', startGalleryAutoSlide);
+
+  // Initialize gallery slider
+  updateSlideDisplay();
+  startGalleryAutoSlide();
+}
+
+// Initialize both sliders when the DOM is loaded
+document.addEventListener('DOMContentLoaded', function() {
+  initBannerSlider();
+  initGallerySlider();
+
+  // Handle visibility changes
+  document.addEventListener('visibilitychange', () => {
+    if (document.hidden) {
+      clearInterval(bannerSlideInterval);
+      clearInterval(gallerySlideInterval);
+    } else {
+      initBannerSlider();
+      initGallerySlider();
+    }
+  });
+});
+</script>
+
+<script>
+  // Handle header visibility on scroll
+let lastScroll = 0;
+const header = document.querySelector('header');
+
+window.addEventListener('scroll', () => {
+  const currentScroll = window.pageYOffset;
+  
+  if (currentScroll > lastScroll && currentScroll > 100) {
+    header.classList.add('hide');
+  } else {
+    header.classList.remove('hide');
+  }
+  
+  lastScroll = currentScroll;
+});
+
+// Animate sections on scroll into view
+const sections = document.querySelectorAll('section');
+const observerOptions = {
+  threshold: 0.2,
+  rootMargin: '0px'
+};
+
+const sectionObserver = new IntersectionObserver((entries) => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) {
+      entry.target.classList.add('visible');
+    }
+  });
+}, observerOptions);
+
+sections.forEach(section => {
+  sectionObserver.observe(section);
+});
+
+// Enhanced slider transitions
+function updateSlideDisplay() {
+  slides.forEach(slide => {
+    slide.classList.remove('active');
+    slide.style.transform = 'scale(1.1)';
+  });
+  
+  slides[currentSlide].classList.add('active');
+  setTimeout(() => {
+    slides[currentSlide].style.transform = 'scale(1)';
+  }, 50);
+}
+</script>
+<script>
+  document.querySelectorAll('.important-links li:nth-child(-n+3) a').forEach((link, index) => {
+  link.addEventListener('click', (event) => {
+    event.preventDefault(); // Prevent default link behavior
+    
+    const sectionIds = ['BOD', 'board', 'about'];
+    const targetSectionId = sectionIds[index];
+    
+    const section = document.getElementById(targetSectionId);
+    if (section) {
+      section.scrollIntoView({ behavior: 'smooth' });
+    }
+  });
+});
+</script>
+
+<script>
+// Toast Notification
+function showToast(message, type = 'success') {
+    const toast = document.getElementById('toast');
+    if (!toast) return;
+    toast.textContent = message;
+    toast.className = `toast show ${type}`;
+    setTimeout(() => {
+        toast.className = toast.className.replace('show', '');
+    }, 3000);
+}
+
+// User dropdown functionality
+function toggleUserMenu() {
+    const userMenu = document.getElementById('userMenu');
+    if (userMenu) userMenu.classList.toggle('active');
+}
+
+// Hamburger menu functionality
+function toggleMenu() {
+    const dropdownMenu = document.getElementById('dropdownMenu');
+    if (dropdownMenu) dropdownMenu.classList.toggle('active');
+}
+
+// Close user menu when clicking outside
+document.addEventListener('click', function(event) {
+    const userDropdown = document.querySelector('.user-dropdown');
+    const userMenu = document.getElementById('userMenu');
+    if (userDropdown && userMenu && !userDropdown.contains(event.target)) {
+        userMenu.classList.remove('active');
+    }
+});
+
+// Display flashed messages as toasts
+{% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+        window.addEventListener('DOMContentLoaded', () => {
+            {% for category, message in messages %}
+                showToast("{{ message }}", "{{ category }}");
+            {% endfor %}
+        });
+    {% endif %}
+{% endwith %}
+</script>
+  </body>
+</html>

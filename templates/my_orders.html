@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>My Orders - KrishnaKath Dairy</title>
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='index.css') }}"
+    />
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='my_orders.css') }}"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.0/css/all.min.css"
+    />
+  </head>
+  <body>
+    {% include 'includes/header.html' %}
+
+    <div class="orders-container">
+      <div class="orders-header">
+        <h1>My Orders</h1>
+      </div>
+
+      {% if orders %}
+      <div class="orders-list">
+        {% for order in orders %}
+        <div class="order-card">
+          <div class="order-card-header">
+            <div class="order-info">
+              <h3>Order #{{ order.id }}</h3>
+              <p>Placed on: {{ order.created_at.strftime('%d %b %Y') }}</p>
+            </div>
+            <div
+              class="order-status status-{{ order.status.lower().replace(' ', '-') }}"
+            >
+              {{ order.status }}
+            </div>
+          </div>
+          <div class="order-card-body">
+            <div class="order-items">
+              {% for item in order.items %}
+              <div class="order-item">
+                <img
+                  src="{{ url_for('static', filename='images/' + item.product.image) }}"
+                  alt="{{ item.product.name }}"
+                />
+                <div class="item-details">
+                  <p class="item-name">{{ item.product.name }}</p>
+                  <p class="item-qty-price">
+                    Qty: {{ item.quantity }} &times; ₹{{
+                    "%.2f"|format(item.price) }}
+                  </p>
+                </div>
+                <p class="item-total">
+                  ₹{{ "%.2f"|format(item.quantity * item.price) }}
+                </p>
+              </div>
+              {% endfor %}
+            </div>
+            <div class="order-summary">
+              <p>
+                <strong>Total:</strong> ₹{{ "%.2f"|format(order.total_amount) }}
+              </p>
+              <p><strong>Transaction ID:</strong> {{ order.transaction_id }}</p>
+            </div>
+          </div>
+          <div class="order-card-footer">
+            <div class="footer-content">
+              <div class="shipping-info">
+                <h4>Shipping Address</h4>
+                <p>{{ order.shipping_address.replace('\\n', '<br />')|safe }}</p>
+              </div>
+              <div class="order-actions">
+                <a
+                  href="{{ url_for('order.download_invoice', order_id=order.id) }}"
+                  class="download-invoice-btn"
+                  title="Download Invoice"
+                >
+                  <i class="fas fa-download"></i>
+                  Download Invoice
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+      {% else %}
+      <div class="no-orders">
+        <p>You haven't placed any orders yet.</p>
+        <a href="{{ url_for('product.products') }}" class="btn-primary"
+          >Start Shopping</a
+        >
+      </div>
+      {% endif %}
+    </div>
+  </body>
+</html>

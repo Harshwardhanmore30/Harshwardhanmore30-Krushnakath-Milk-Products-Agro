@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Your Cart - KrishnaKath Dairy</title>
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='index.css') }}"
+    />
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='cart.css') }}"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.0/css/all.min.css"
+    />
+  </head>
+  <body>
+    <!-- Toast Notification -->
+    <div id="toast" class="toast"></div>
+
+    {% include 'includes/header.html' %}
+
+    <div class="cart-container">
+      {% if cart_items %}
+      <div class="cart-header">
+        <h1>Shopping Cart</h1>
+        <a href="{{ url_for('product.products') }}" class="continue-shopping">
+          <i class="fas fa-arrow-left"></i> Continue Shopping
+        </a>
+      </div>
+
+      <div class="cart-body">
+        <div class="cart-items-list">
+          {% for item in cart_items %}
+          <div class="cart-item">
+            <div class="item-product">
+              <img
+                src="{{ url_for('static', filename='images/' + item.image) }}"
+                alt="{{ item.name }}"
+                class="product-image"
+              />
+              <div class="product-details">
+                <h3 class="product-name">{{ item.name }}</h3>
+                <p class="product-category">{{ item.category }}</p>
+                <form
+                  method="POST"
+                  action="{{ url_for('cart.remove_from_cart', product_id=item.product_id) }}"
+                >
+                  <button type="submit" class="remove-btn">
+                    <i class="fas fa-trash-alt"></i> Remove
+                  </button>
+                </form>
+              </div>
+            </div>
+            <div class="item-quantity">
+              <form
+                method="POST"
+                action="{{ url_for('cart.update_cart', product_id=item.product_id) }}"
+                class="quantity-form"
+              >
+                <button
+                  type="button"
+                  class="quantity-btn minus-btn"
+                  data-id="{{ item.product_id }}"
+                >
+                  -
+                </button>
+                <input
+                  type="number"
+                  name="quantity"
+                  class="quantity-input"
+                  value="{{ item.quantity }}"
+                  min="1"
+                  max="{{ item.stock }}"
+                />
+                <button
+                  type="button"
+                  class="quantity-btn plus-btn"
+                  data-id="{{ item.product_id }}"
+                >
+                  +
+                </button>
+              </form>
+            </div>
+            <div class="item-price">
+              <span class="price-label">Unit Price</span><br />
+              <span>₹{{ "%.2f"|format(item.price) }}</span>
+            </div>
+            <div class="item-subtotal">
+              <span class="price-label">Total</span><br />
+              <span>₹{{ "%.2f"|format(item.price * item.quantity) }}</span>
+            </div>
+          </div>
+          {% endfor %}
+        </div>
+
+        <div class="cart-summary">
+          <div class="summary-card">
+            <h2>Order Summary</h2>
+            <div class="summary-line">
+              <span>Subtotal</span>
+              <span id="summary-subtotal">₹{{ "%.2f"|format(total) }}</span>
+            </div>
+            <div class="summary-line">
+              <span>Shipping</span>
+              <span>Free</span>
+            </div>
+            <div class="summary-total">
+              <span>Total</span>
+              <span id="summary-total">₹{{ "%.2f"|format(total) }}</span>
+            </div>
+            <a href="{{ url_for('cart.checkout') }}" class="btn-checkout">
+              Proceed to Checkout <i class="fas fa-arrow-right"></i>
+            </a>
+          </div>
+          <div class="cart-actions">
+            <form method="POST" action="{{ url_for('cart.clear_cart') }}">
+              <button
+                type="submit"
+                class="btn-clear-cart"
+                onclick="return confirm('Are you sure you want to clear your cart?');"
+              >
+                <i class="fas fa-times"></i> Clear Cart
+              </button>
+            </form>
+          </div>
+        </div>
+      </div>
+      {% else %}
+      <div class="empty-cart-container">
+        <div class="empty-cart">
+          <img
+            src="{{ url_for('static', filename='icons/carts.png') }}"
+            alt="Empty Cart"
+            class="empty-cart-icon"
+          />
+          <h2>Your cart is empty.</h2>
+          <p>Looks like you haven't added anything to your cart yet.</p>
+          <a href="{{ url_for('product.products') }}" class="btn-primary"
+            >Shop Now</a
+          >
+        </div>
+      </div>
+      {% endif %}
+    </div>
+
+    <script>
+      // Toast Notification
+      function showToast(message, type = 'success') {
+        const toast = document.getElementById('toast');
+        if (!toast) return;
+        toast.textContent = message;
+        toast.className = `toast show ${type}`;
+        setTimeout(() => {
+          toast.className = toast.className.replace('show', '');
+        }, 3000);
+      }
+
+      // Display flashed messages as toasts
+      {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+          window.addEventListener('DOMContentLoaded', () => {
+            {% for category, message in messages %}
+              showToast("{{ message }}", "{{ category }}");
+            {% endfor %}
+          });
+        {% endif %}
+      {% endwith %}
+
+      // Logic to handle quantity updates without page reload
+      document.addEventListener("DOMContentLoaded", function () {
+        document.querySelectorAll(".quantity-btn").forEach((button) => {
+          button.addEventListener("click", function () {
+            const input = this.parentElement.querySelector(".quantity-input");
+            let quantity = parseInt(input.value);
+            if (this.classList.contains("plus-btn")) {
+              quantity++;
+            } else if (this.classList.contains("minus-btn")) {
+              quantity--;
+            }
+            if (quantity < 1) quantity = 1;
+            input.value = quantity;
+            this.closest("form").submit();
+          });
+        });
+      });
+    </script>
+  </body>
+</html>

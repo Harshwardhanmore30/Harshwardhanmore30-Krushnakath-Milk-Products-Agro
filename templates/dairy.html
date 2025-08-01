@@ -1,0 +1,499 @@
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Premium Dairy Products - KrishnaKath Dairy</title>
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='dairy.css') }}"
+    />
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='index.css') }}"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
+  </head>
+  <body>
+    <!-- Toast Notification -->
+    <div id="toast" class="toast"></div>
+
+    {% include 'includes/header.html' %}
+
+    <!-- Products Section -->
+    <section id="products" class="products-section">
+      <div class="container">
+        <div class="section-header">
+          <h2 class="section-title">Our Premium Products</h2>
+          <p class="section-subtitle">Discover our range of fresh, high-quality dairy products</p>
+        </div>
+
+        <div class="product-grid">
+          {% for product in products %}
+          <div class="product-card" data-aos="fade-up" data-aos-delay="{{ loop.index0 * 100 }}" data-product-id="{{ product.id }}">
+            <div class="product-image-container">
+              <img
+                src="{{ url_for('static', filename='images/' + product.image) }}"
+                alt="{{ product.name }}"
+                class="product-image"
+                loading="lazy"
+              />
+
+              {% if product.stock < 10 %}
+              <div class="stock-badge low-stock">
+                <i class="fas fa-exclamation-triangle"></i>
+                Low Stock
+              </div>
+              {% elif product.stock == 0 %}
+              <div class="stock-badge out-of-stock">
+                <i class="fas fa-times-circle"></i>
+                Out of Stock
+              </div>
+              {% endif %}
+            </div>
+            <div class="product-info">
+              <div class="product-category">{{ product.category or 'Dairy' }}</div>
+              <h3 class="product-name">{{ product.name }}</h3>
+              <p class="product-description">{{ product.description[:80] }}{% if product.description|length > 80 %}...{% endif %}</p>
+              <div class="product-price">
+                <span class="price">₹{{ "%.2f"|format(product.price) }}</span>
+                <span class="price-unit">per unit</span>
+              </div>
+              <div class="product-rating">
+                <div class="stars">
+                  <i class="fas fa-star"></i>
+                  <i class="fas fa-star"></i>
+                  <i class="fas fa-star"></i>
+                  <i class="fas fa-star"></i>
+                  <i class="fas fa-star"></i>
+                </div>
+                <span class="rating-text">5.0 ({{ (product.id * 7 + 15) % 50 + 10 }} reviews)</span>
+              </div>
+              <div class="product-stock">
+                <i class="fas fa-box"></i>
+                <span>{{ product.stock }} in stock</span>
+              </div>
+              <div class="product-actions-bottom">
+                <button class="view-details-btn" data-product-id="{{ product.id }}" type="button">
+                  <span>View Details</span>
+                  <i class="fas fa-arrow-right"></i>
+                </button>
+                <button class="quick-add-btn" data-product-id="{{ product.id }}" data-product-name="{{ product.name }}" {% if product.stock == 0 %}disabled{% endif %} type="button">
+                  <i class="fas fa-cart-plus"></i>
+                </button>
+              </div>
+            </div>
+          </div>
+          {% endfor %}
+        </div>
+
+        {% if not products %}
+        <div class="no-products">
+          <div class="no-products-content">
+            <i class="fas fa-search"></i>
+            <h3>No Products Found</h3>
+            <p>We couldn't find any products matching your criteria.</p>
+            <a href="{{ url_for('product.products') }}" class="btn btn-primary">View All Products</a>
+          </div>
+        </div>
+        {% endif %}
+      </div>
+    </section>
+
+    <!-- Quick View Modal -->
+    <div id="quickViewModal" class="modal">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h2 id="modalProductName">Product Name</h2>
+          <span class="close" onclick="closeQuickView()">&times;</span>
+        </div>
+        <div class="modal-body">
+          <div class="modal-product-image">
+            <img id="modalProductImage" src="" alt="Product Image" />
+          </div>
+          <div class="modal-product-info">
+            <div class="modal-product-category" id="modalProductCategory">Category</div>
+            <p class="modal-product-description" id="modalProductDescription">Product description...</p>
+            <div class="modal-product-price">
+              <span class="price" id="modalProductPrice">₹0.00</span>
+              <span class="price-unit">per unit</span>
+            </div>
+            <div class="modal-product-stock">
+              <i class="fas fa-box"></i>
+              <span id="modalProductStock">0 in stock</span>
+            </div>
+            <div class="modal-product-rating">
+              <div class="stars">
+                <i class="fas fa-star"></i>
+                <i class="fas fa-star"></i>
+                <i class="fas fa-star"></i>
+                <i class="fas fa-star"></i>
+                <i class="fas fa-star"></i>
+              </div>
+              <span class="rating-text">5.0 (24 reviews)</span>
+            </div>
+            <div class="modal-actions">
+              <div class="quantity-selector">
+                <button type="button" onclick="decreaseQuantity()">-</button>
+                <input type="number" id="modalQuantity" value="1" min="1" max="10">
+                <button type="button" onclick="increaseQuantity()">+</button>
+              </div>
+              <button class="btn btn-primary" id="modalAddToCart" onclick="addToCartFromModal()">
+                <i class="fas fa-cart-plus"></i>
+                Add to Cart
+              </button>
+              <button class="btn btn-secondary" id="modalViewDetails" onclick="viewDetailsFromModal()">
+                <i class="fas fa-eye"></i>
+                View Details
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Hero Section -->
+    <section class="hero-section">
+      <div class="hero-content">
+        <div class="hero-text">
+          <h2 class="hero-title">Premium Dairy Products</h2>
+          <p class="hero-subtitle">Farm-fresh quality delivered to your doorstep</p>
+          <div class="hero-stats">
+            <div class="stat">
+              <i class="fas fa-award"></i>
+              <span>100% Pure</span>
+            </div>
+            <div class="stat">
+              <i class="fas fa-leaf"></i>
+              <span>All Natural</span>
+            </div>
+            <div class="stat">
+              <i class="fas fa-truck"></i>
+              <span>Farm Fresh</span>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="hero-overlay"></div>
+    </section>
+
+    <!-- Loading Spinner -->
+    <div id="loadingSpinner" class="loading-spinner">
+      <div class="spinner"></div>
+      <p>Loading...</p>
+    </div>
+
+
+
+    <!-- AOS Animation Library -->
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+
+    <script>
+      // Initialize AOS animations
+      AOS.init({
+        duration: 800,
+        easing: 'ease-in-out',
+        once: true,
+        offset: 100
+      });
+
+      // Toast Notification
+      function showToast(message, type = 'success') {
+          const toast = document.getElementById('toast');
+          if (!toast) return;
+          toast.textContent = message;
+          toast.className = `toast show ${type}`;
+          setTimeout(() => {
+              toast.className = toast.className.replace('show', '');
+          }, 3000);
+      }
+
+      // User dropdown functionality
+      function toggleUserMenu() {
+          const userMenu = document.getElementById('userMenu');
+          if (userMenu) userMenu.classList.toggle('active');
+      }
+
+      // Hamburger menu functionality
+      function toggleMenu() {
+          const dropdownMenu = document.getElementById('dropdownMenu');
+          if (dropdownMenu) dropdownMenu.classList.toggle('active');
+      }
+
+      // Close user menu when clicking outside
+      document.addEventListener('click', function(event) {
+          const userDropdown = document.querySelector('.user-dropdown');
+          const userMenu = document.getElementById('userMenu');
+          if (userDropdown && userMenu && !userDropdown.contains(event.target)) {
+              userMenu.classList.remove('active');
+          }
+      });
+
+      // Smooth scrolling for anchor links
+      document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+          anchor.addEventListener('click', function (e) {
+              e.preventDefault();
+              const target = document.querySelector(this.getAttribute('href'));
+              if (target) {
+                  target.scrollIntoView({
+                      behavior: 'smooth',
+                      block: 'start'
+                  });
+              }
+          });
+      });
+
+      // Global variables for modal
+      let currentProductId = null;
+      let currentProductData = null;
+
+      // Quick View functionality
+      async function quickView(productId) {
+          try {
+              showLoading();
+              const response = await fetch(`/api/product/${productId}`);
+              if (!response.ok) throw new Error('Product not found');
+
+              const product = await response.json();
+              currentProductId = productId;
+              currentProductData = product;
+
+              // Populate modal with product data
+              document.getElementById('modalProductName').textContent = product.name;
+              document.getElementById('modalProductImage').src = `/static/images/${product.image}`;
+              document.getElementById('modalProductImage').alt = product.name;
+              document.getElementById('modalProductCategory').textContent = product.category || 'Dairy';
+              document.getElementById('modalProductDescription').textContent = product.description;
+              document.getElementById('modalProductPrice').textContent = `₹${product.price.toFixed(2)}`;
+              document.getElementById('modalProductStock').textContent = `${product.stock} in stock`;
+
+              // Set max quantity based on stock
+              const quantityInput = document.getElementById('modalQuantity');
+              quantityInput.max = Math.min(product.stock, 10);
+              quantityInput.value = 1;
+
+              // Disable add to cart if out of stock
+              const addToCartBtn = document.getElementById('modalAddToCart');
+              if (product.stock === 0) {
+                  addToCartBtn.disabled = true;
+                  addToCartBtn.innerHTML = '<i class="fas fa-times"></i> Out of Stock';
+              } else {
+                  addToCartBtn.disabled = false;
+                  addToCartBtn.innerHTML = '<i class="fas fa-cart-plus"></i> Add to Cart';
+              }
+
+              hideLoading();
+              document.getElementById('quickViewModal').style.display = 'block';
+              document.body.style.overflow = 'hidden';
+
+          } catch (error) {
+              hideLoading();
+              showToast('Error loading product details', 'error');
+              console.error('Error:', error);
+          }
+      }
+
+      function closeQuickView() {
+          document.getElementById('quickViewModal').style.display = 'none';
+          document.body.style.overflow = 'auto';
+          currentProductId = null;
+          currentProductData = null;
+      }
+
+      function increaseQuantity() {
+          const input = document.getElementById('modalQuantity');
+          const max = parseInt(input.max);
+          const current = parseInt(input.value);
+          if (current < max) {
+              input.value = current + 1;
+          }
+      }
+
+      function decreaseQuantity() {
+          const input = document.getElementById('modalQuantity');
+          const current = parseInt(input.value);
+          if (current > 1) {
+              input.value = current - 1;
+          }
+      }
+
+      function viewDetailsFromModal() {
+          if (currentProductId) {
+              window.location.href = `/product/${currentProductId}`;
+          }
+      }
+
+      async function addToCartFromModal() {
+          if (!currentProductId) return;
+
+          const quantity = parseInt(document.getElementById('modalQuantity').value);
+          await addToCart(currentProductId, currentProductData.name, quantity);
+          closeQuickView();
+      }
+
+      // Add to Cart functionality
+      async function addToCart(productId, productName, quantity = 1) {
+          try {
+              showLoading();
+
+              // Check if user is logged in
+              const isLoggedIn = {{ 'true' if session.get('user_id') else 'false' }};
+
+              if (!isLoggedIn) {
+                  hideLoading();
+                  showToast('Please log in to add items to your cart', 'error');
+                  setTimeout(() => {
+                      window.location.href = '/login';
+                  }, 2000);
+                  return;
+              }
+
+              const formData = new FormData();
+              formData.append('quantity', quantity);
+
+              const response = await fetch(`/cart/add/${productId}`, {
+                  method: 'POST',
+                  body: formData
+              });
+
+              hideLoading();
+
+              if (response.ok) {
+                  showToast(`Added ${quantity}x ${productName} to cart!`, 'success');
+                  // Update cart count in header if it exists
+                  updateCartCount();
+              } else {
+                  const errorText = await response.text();
+                  showToast('Failed to add item to cart', 'error');
+              }
+
+          } catch (error) {
+              hideLoading();
+              showToast('Error adding item to cart', 'error');
+              console.error('Error:', error);
+          }
+      }
+
+      // Update cart count in header
+      async function updateCartCount() {
+          try {
+              const response = await fetch('/api/cart/count');
+              if (response.ok) {
+                  const data = await response.json();
+                  const cartCountElement = document.querySelector('.cart-count');
+                  if (cartCountElement) {
+                      cartCountElement.textContent = data.count;
+                  }
+              }
+          } catch (error) {
+              console.error('Error updating cart count:', error);
+          }
+      }
+
+      // Loading spinner functions
+      function showLoading() {
+          document.getElementById('loadingSpinner').style.display = 'flex';
+      }
+
+      function hideLoading() {
+          document.getElementById('loadingSpinner').style.display = 'none';
+      }
+
+      // Close modal when clicking outside
+      window.onclick = function(event) {
+          const modal = document.getElementById('quickViewModal');
+          if (event.target === modal) {
+              closeQuickView();
+          }
+      }
+
+      // Keyboard navigation for modal
+      document.addEventListener('keydown', function(event) {
+          if (event.key === 'Escape') {
+              closeQuickView();
+          }
+      });
+
+      // Product card hover effects
+      document.querySelectorAll('.product-card').forEach(card => {
+          card.addEventListener('mouseenter', function() {
+              this.style.transform = 'translateY(-10px)';
+          });
+
+          card.addEventListener('mouseleave', function() {
+              this.style.transform = 'translateY(0)';
+          });
+      });
+
+      // View Product Details function
+      function viewProductDetails(productId) {
+          console.log('Navigating to product details for ID:', productId);
+          try {
+              window.location.href = `/product/${productId}`;
+          } catch (error) {
+              console.error('Error navigating to product details:', error);
+              showToast('Error loading product details', 'error');
+          }
+      }
+
+      // Add click event listeners to buttons
+      document.addEventListener('DOMContentLoaded', function() {
+          console.log('DOM loaded, setting up button event listeners...');
+
+          // View Details buttons
+          const viewDetailsButtons = document.querySelectorAll('.view-details-btn');
+          viewDetailsButtons.forEach(button => {
+              button.addEventListener('click', function(e) {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  const productId = this.getAttribute('data-product-id');
+                  console.log('View Details clicked for product:', productId);
+                  viewProductDetails(productId);
+              });
+          });
+
+          // Quick Add buttons
+          const quickAddButtons = document.querySelectorAll('.quick-add-btn');
+          quickAddButtons.forEach(button => {
+              button.addEventListener('click', function(e) {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  if (this.disabled) return;
+                  const productId = this.getAttribute('data-product-id');
+                  const productName = this.getAttribute('data-product-name');
+                  console.log('Quick Add clicked for product:', productId);
+                  addToCart(productId, productName);
+              });
+          });
+
+
+
+          console.log('Event listeners attached:', {
+              viewDetails: viewDetailsButtons.length,
+              quickAdd: quickAddButtons.length
+          });
+      });
+
+      // Display flashed messages as toasts
+      {% with messages = get_flashed_messages(with_categories=true) %}
+          {% if messages %}
+              window.addEventListener('DOMContentLoaded', () => {
+                  {% for category, message in messages %}
+                      showToast("{{ message }}", "{{ category }}");
+                  {% endfor %}
+              });
+          {% endif %}
+      {% endwith %}
+    </script>
+  </body>
+</html>
+

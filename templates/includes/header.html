@@ -1,0 +1,61 @@
+<header>
+  <img
+    src="{{ url_for('static', filename='images/logo.png') }}"
+    alt="Dairy Shop Logo"
+    class="logo"
+  />
+  <div class="menu-container">
+    {% if session.get('username') %}
+    <div class="nav-links">
+      <a href="{{ url_for('product.index') }}">Home</a>
+      <a href="{{ url_for('product.products') }}">Products</a>
+      <a href="{{ url_for('feedback.feedback') }}">Feedback</a>
+      {% if session.get('user_type') != 'admin' %}
+      <a href="{{ url_for('cart.view_cart') }}" class="cart-icon-container">
+        <img
+          src="{{ url_for('static', filename='icons/carts.png') }}"
+          alt="Cart"
+          class="cart-icon"
+        />
+        <span class="cart-count">{{ cart_count or 0 }}</span>
+      </a>
+      {% endif %}
+    </div>
+    <div class="user-dropdown">
+      <button class="user-btn" onclick="toggleUserMenu()">
+        Welcome, {{ session.get('first_name', session.get('username')) }}!
+        <span class="dropdown-arrow">▼</span>
+      </button>
+      <div class="user-menu" id="userMenu">
+        <div class="user-info">
+          <span class="user-name">{{ session.get('first_name', session.get('username')) }}</span>
+          <span class="user-email">{{ session.get('email') }}</span>
+        </div>
+        <a href="{{ url_for('auth.profile') }}" class="menu-item">Profile</a>
+        {% if session.get('user_type') != 'admin' %}
+        <a href="{{ url_for('order.my_orders') }}" class="menu-item"
+          >My Orders</a
+        >
+        {% endif %}
+        <a href="{{ url_for('auth.logout') }}" class="menu-item logout"
+          >Logout</a
+        >
+      </div>
+    </div>
+    {% else %}
+    <a href="{{ url_for('auth.login') }}" class="cart-btn">Login</a>
+    <a href="{{ url_for('auth.signup') }}" class="cart-btn">SignUp</a>
+    {% endif %}
+  </div>
+</header>
+<script>
+  function toggleUserMenu() {
+    document.getElementById("userMenu").classList.toggle("active");
+  }
+  document.addEventListener("click", function (event) {
+    const userDropdown = document.querySelector(".user-dropdown");
+    if (userDropdown && !userDropdown.contains(event.target)) {
+      document.getElementById("userMenu").classList.remove("active");
+    }
+  });
+</script>

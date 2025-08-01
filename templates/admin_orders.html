@@ -1,0 +1,40 @@
+{% extends "admin_base.html" %} {% block title %}All Orders{% endblock %} {%
+block content %}
+<div class="content-header">
+  <h2>All Customer Orders</h2>
+</div>
+<table class="data-table">
+  <thead>
+    <tr>
+      <th>Order ID</th>
+      <th>Customer</th>
+      <th>Total Amount</th>
+      <th>Status</th>
+      <th>Date</th>
+      <th>Actions</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for order in orders %}
+    <tr>
+      <td>{{ order.id }}</td>
+      <td>{{ order.user.first_name }} {{ order.user.last_name }}</td>
+      <td>₹{{ "%.2f"|format(order.total_amount) }}</td>
+      <td>
+        <span class="status-{{ order.status.lower().replace(' ', '-') }}"
+          >{{ order.status }}</span
+        >
+      </td>
+      <td>{{ order.created_at.strftime('%Y-%m-%d %H:%M') }}</td>
+      <td class="action-buttons">
+        <a
+          href="{{ url_for('admin.admin_order_detail', order_id=order.id) }}"
+          class="btn btn-secondary"
+          >View Details</a
+        >
+      </td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% endblock %}

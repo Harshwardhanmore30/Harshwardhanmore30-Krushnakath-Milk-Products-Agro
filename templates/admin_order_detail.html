@@ -1,0 +1,96 @@
+{% extends "admin_base.html" %} {% block title %}Order #{{ order.id }} Details{%
+endblock %} {% block content %}
+<div class="order-detail-container">
+  <div class="content-header">
+    <h2>Order #{{ order.id }}</h2>
+    <a href="{{ url_for('admin.admin_orders') }}" class="btn btn-secondary"
+      >Back to All Orders</a
+    >
+  </div>
+
+  <div class="order-detail-grid">
+    <div class="customer-info card">
+      <h3>Customer Information</h3>
+      <p>
+        <strong>Name:</strong> {{ order.user.first_name }} {{
+        order.user.last_name }}
+      </p>
+      <p><strong>Email:</strong> {{ order.user.email }}</p>
+      <p><strong>Shipping Address:</strong> {{ order.shipping_address }}</p>
+    </div>
+
+    <div class="payment-info card">
+      <h3>Payment Details</h3>
+      <p>
+        <strong>Total Amount:</strong> ₹{{ "%.2f"|format(order.total_amount) }}
+      </p>
+      <p>
+        <strong>Order Status:</strong>
+        <span class="status-{{ order.status.lower().replace(' ', '-') }}"
+          >{{ order.status }}</span
+        >
+      </p>
+      <p>
+        <strong>Order Date:</strong> {{ order.created_at.strftime('%Y-%m-%d
+        %H:%M') }}
+      </p>
+      <p><strong>Transaction ID:</strong> {{ order.transaction_id }}</p>
+      <p><strong>Payment Screenshot:</strong></p>
+      <a
+        href="{{ url_for('static', filename='uploads/' + order.payment_screenshot) }}"
+        target="_blank"
+      >
+        <img
+          src="{{ url_for('static', filename='uploads/' + order.payment_screenshot) }}"
+          alt="Payment Screenshot"
+          class="payment-screenshot"
+        />
+      </a>
+    </div>
+  </div>
+
+  <div class="order-items card">
+    <h3>Items Ordered</h3>
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>Product</th>
+          <th>Quantity</th>
+          <th>Unit Price</th>
+          <th>Total</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for item in order.items %}
+        <tr>
+          <td>{{ item.product.name }}</td>
+          <td>{{ item.quantity }}</td>
+          <td>₹{{ "%.2f"|format(item.price) }}</td>
+          <td>₹{{ "%.2f"|format(item.price * item.quantity) }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+  {% if order.status == 'Pending Verification' %}
+  <div class="order-actions">
+    <h3>Actions</h3>
+    <form
+      action="{{ url_for('admin.approve_order', order_id=order.id) }}"
+      method="POST"
+      style="display: inline"
+    >
+      <button type="submit" class="btn btn-primary">Approve Order</button>
+    </form>
+    <form
+      action="{{ url_for('admin.reject_order', order_id=order.id) }}"
+      method="POST"
+      style="display: inline"
+    >
+      <button type="submit" class="btn btn-danger">Reject Order</button>
+    </form>
+  </div>
+  {% endif %}
+</div>
+{% endblock %}

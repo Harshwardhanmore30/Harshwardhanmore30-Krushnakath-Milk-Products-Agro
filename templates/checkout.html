@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Checkout - KrishnaKath Dairy</title>
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='index.css') }}"
+    />
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='checkout.css') }}"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.0/css/all.min.css"
+    />
+  </head>
+  <body>
+    {% include 'includes/header.html' %}
+
+    <!-- Toast Notification -->
+    <div id="toast" class="toast"></div>
+
+    <div class="checkout-container">
+      <div class="checkout-header">
+        <h1>Checkout</h1>
+        <a href="{{ url_for('cart.view_cart') }}" class="back-to-cart">
+          <i class="fas fa-arrow-left"></i> Back to Cart
+        </a>
+      </div>
+
+      <div class="checkout-body">
+        <div class="shipping-details">
+          <h2>Shipping Information</h2>
+          <form
+            action="{{ url_for('cart.checkout') }}"
+            method="POST"
+            class="shipping-form"
+          >
+            <div class="form-group">
+              <label for="name">Full Name</label>
+              <input
+                type="text"
+                id="name"
+                name="name"
+                value="{{ user.first_name }} {{ user.last_name }}"
+                required
+              />
+            </div>
+            <div class="form-group">
+              <label for="email">Email Address</label>
+              <input
+                type="email"
+                id="email"
+                name="email"
+                value="{{ user.email }}"
+                required
+              />
+            </div>
+            <div class="form-group">
+              <label for="contact">Contact Number</label>
+              <input
+                type="tel"
+                id="contact"
+                name="contact"
+                value="{{ user.phone }}"
+                required
+              />
+            </div>
+            <div class="form-group">
+              <label for="address">Shipping Address</label>
+              <textarea id="address" name="address" rows="4" required>
+{{ user.address }}</textarea
+              >
+            </div>
+          </form>
+        </div>
+
+        <div class="order-summary">
+          <div class="summary-card">
+            <h2>Order Summary</h2>
+            <div class="summary-items">
+              {% for item in cart_items %}
+              <div class="summary-item">
+                <img
+                  src="{{ url_for('static', filename='images/' + item.image) }}"
+                  alt="{{ item.name }}"
+                  class="item-image"
+                />
+                <div class="item-info">
+                  <span class="item-name">{{ item.name }}</span>
+                  <span class="item-quantity">Qty: {{ item.quantity }}</span>
+                </div>
+                <span class="item-price">₹{{ "%.2f"|format(item.total) }}</span>
+              </div>
+              {% endfor %}
+            </div>
+            <div class="summary-line">
+              <span>Subtotal</span>
+              <span id="summary-subtotal">₹{{ "%.2f"|format(total) }}</span>
+            </div>
+            <div class="summary-line">
+              <span>Shipping</span>
+              <span>Free</span>
+            </div>
+            <div class="summary-total">
+              <span>Total</span>
+              <span id="summary-total">₹{{ "%.2f"|format(total) }}</span>
+            </div>
+            <button type="button" class="btn-checkout" id="proceedToPaymentBtn">
+              Proceed to Payment <i class="fas fa-arrow-right"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Payment Modal -->
+    <div id="paymentModal" class="modal">
+      <div class="modal-content">
+        <span class="close-btn">&times;</span>
+        <h2>Complete Your Payment</h2>
+        <div id="qr-code-step">
+          <p>Please scan the QR code below to make your payment.</p>
+          <img
+            src="{{ url_for('static', filename='images/qr_code_placeholder.jpg') }}"
+            alt="QR Code for Payment"
+            class="qr-code-img"
+          />
+          <p><strong>Total Amount: ₹{{ "%.2f"|format(total) }}</strong></p>
+          <button type="button" id="paymentConfirmedBtn" class="btn-primary">
+            I Have Paid
+          </button>
+        </div>
+        <div id="confirmation-step" style="display: none">
+          <p>Please provide the transaction details to confirm your order.</p>
+          <!-- The shipping form is now inside the modal confirmation step -->
+          <form
+            action="{{ url_for('cart.checkout') }}"
+            method="POST"
+            class="shipping-form"
+            id="confirmationForm"
+            enctype="multipart/form-data"
+          >
+            <!-- Hidden fields to pass original shipping info -->
+            <input type="hidden" id="modal_name" name="name" />
+            <input type="hidden" id="modal_email" name="email" />
+            <input type="hidden" id="modal_contact" name="contact" />
+            <input type="hidden" id="modal_address" name="address" />
+
+            <div class="form-group">
+              <label for="transaction_id">Transaction ID</label>
+              <input
+                type="text"
+                id="transaction_id"
+                name="transaction_id"
+                required
+              />
+            </div>
+            <div class="form-group">
+              <label for="payment_screenshot">Payment Screenshot</label>
+              <input
+                type="file"
+                id="payment_screenshot"
+                name="payment_screenshot"
+                accept="image/*"
+                required
+              />
+            </div>
+            <button type="submit" class="btn-checkout">Confirm Order</button>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      // Most aggressive autofill fix
+      function fixAutofill() {
+        document.querySelectorAll("input:-webkit-autofill").forEach((input) => {
+          input.classList.add("is-autofilled");
+        });
+      }
+
+      // Run on load and then on an interval to catch any delayed autofill
+      window.addEventListener("load", () => {
+        fixAutofill();
+        const interval = setInterval(fixAutofill, 50);
+        setTimeout(() => {
+          clearInterval(interval);
+        }, 1000); // Stop checking after 1 second
+      });
+
+      // Also run on focus as a fallback
+      document.querySelectorAll(".form-group input").forEach((input) => {
+        input.addEventListener("focus", fixAutofill);
+      });
+
+      // --- Payment Modal Logic ---
+      const modal = document.getElementById("paymentModal");
+      const proceedBtn = document.getElementById("proceedToPaymentBtn");
+      const confirmedBtn = document.getElementById("paymentConfirmedBtn");
+      const closeBtn = document.querySelector(".modal .close-btn");
+
+      const qrStep = document.getElementById("qr-code-step");
+      const confirmationStep = document.getElementById("confirmation-step");
+
+      // When the user clicks "Proceed to Payment", open the modal
+      proceedBtn.onclick = function () {
+        modal.style.display = "block";
+        qrStep.style.display = "block";
+        confirmationStep.style.display = "none";
+      };
+
+      // When the user clicks "I Have Paid", switch to the confirmation form
+      confirmedBtn.onclick = function () {
+        // Copy shipping details from main form to hidden fields in modal form
+        document.getElementById("modal_name").value =
+          document.getElementById("name").value;
+        document.getElementById("modal_email").value =
+          document.getElementById("email").value;
+        document.getElementById("modal_contact").value =
+          document.getElementById("contact").value;
+        document.getElementById("modal_address").value =
+          document.getElementById("address").value;
+
+        qrStep.style.display = "none";
+        confirmationStep.style.display = "block";
+      };
+
+      // When the user clicks on <span> (x), close the modal
+      closeBtn.onclick = function () {
+        modal.style.display = "none";
+      };
+
+      // When the user clicks anywhere outside of the modal, close it
+      window.onclick = function (event) {
+        if (event.target == modal) {
+          modal.style.display = "none";
+        }
+      };
+
+      // --- Toast Notification Logic ---
+      function showToast(message, type = 'success') {
+        const toast = document.getElementById('toast');
+        if (!toast) return;
+        toast.textContent = message;
+        toast.className = `toast show ${type}`;
+        setTimeout(() => {
+          toast.className = toast.className.replace('show', '');
+        }, 5000); // Increased duration for error messages
+      }
+
+      // Display flashed messages as toasts
+      {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+          window.addEventListener('DOMContentLoaded', () => {
+            {% for category, message in messages %}
+              showToast("{{ message }}", "{{ category }}");
+            {% endfor %}
+          });
+        {% endif %}
+      {% endwith %}
+    </script>
+  </body>
+</html>
